@@ -1,0 +1,46 @@
+version: '2'
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=saleor
+      - POSTGRES_PASSWORD=saleor
+    ports:
+      - '127.0.0.1:5432:5432'
+  redis:
+    image: redis
+    ports:
+      - '127.0.0.1:6379:6379'
+  search:
+    image: elasticsearch:2.4
+    ports:
+      - '127.0.0.1:9200:9200'
+  front:
+    image: nginx:alpine
+    command: [nginx-debug, '-g', 'daemon off;']
+    volumes:
+      - ./nginx/conf/app.conf:/etc/nginx/nginx.conf
+      - ./nginx/logs/error.log:/etc/nginx/logs/error.log
+    depends_on:
+      - web
+    ports:
+      - '8080:8080'
+  web:
+    build: .
+    command: uwsgi  --ini /app/saleor/wsgi/uwsgi.ini  --enable-threads --thunder-lock 
+    environment:
+      - DATABASE_URL=postgres://saleor:saleor@db/saleor
+      - DEFAULT_FROM_EMAIL=noreply@example.com
+      - ELASTICSEARCH_URL=http://search:9200/
+      - OPENEXCHANGERATES_API_KEY
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=changeme
+      - DEBUG=True
+      - GOOGLE_ANALYTICS_TRACKING_ID=UA-100957772-1
+      - saleor.data_feeds.google_merchant.FILE_PATH=/app/csv.csv
+    depends_on:
+      - db
+      - redis
+      - search
+    volumes:
+      - .:/app:Z
