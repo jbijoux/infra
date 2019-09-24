@@ -55,7 +55,7 @@
     "babel-relay-plugin": "^0.10.0",
     "babel-relay-plugin-loader": "^0.10.0",
     "css-loader": "^0.26.1",
-    "eslint": "^3.14.0",
+    "eslint": "^4.18.2",
     "eslint-config-standard": "^6.2.1",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-react": "^6.7.1",
